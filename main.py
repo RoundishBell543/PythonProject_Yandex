@@ -2,7 +2,6 @@ import pygame
 import sys
 import os
 
-
 class Entity(pygame.sprite.Sprite):
     def __init__(self, image):
         super().__init__()
@@ -87,7 +86,19 @@ def load_image(name, colorkey=None):
         image = image.convert_alpha()
     return image
 
+def save_score(score):
+    with open("scores.txt", "a") as f:
+        f.write(str(score) + "\n")
 
+def game_over_screen(screen, score):
+    save_score(score)
+    screen.fill("white")
+    font = pygame.font.Font(None, 50)
+    text = font.render(f"Игра окончена! Ваш счет: {score}", True, "black")
+    screen.blit(text, (800 // 2 - 200, 600 // 2))
+    pygame.display.flip()
+
+    pygame.time.delay(3000)
 def draw_button(screen):
     color_button = pygame.Color(255, 255, 255)
     color_text = pygame.Color(0, 0, 0)
@@ -124,6 +135,7 @@ def draw_second_screen(screen, all_sprites, score):  # Экран самой и�
     score_rect = score_text.get_rect(center=(width // 2, 30))  # По центру вверху
     screen.blit(score_text, score_rect)
 
+
     # Отрисовка спрайтов
     all_sprites.update()
     all_sprites.draw(screen)
@@ -151,6 +163,9 @@ if __name__ == '__main__':
     mario.rect.y = 470 - mario.rect.height  # Помещаем Марио на землю
     all_sprites.add(mario)
 
+    #создание спрайта врага
+
+
     current_screen = "main"
     running = True
     score = 0  # Счетчик
@@ -164,6 +179,9 @@ if __name__ == '__main__':
                     mouse_pos = pygame.mouse.get_pos()
                     if 650 <= mouse_pos[0] <= 750 and 250 <= mouse_pos[1] <= 325:
                         current_screen = "second"
+                        mario.rect.x = 5
+                        mario.rect.y = 470 - mario.rect.height
+                        score = 0
                 elif current_screen == "second":
                     mouse_pos = pygame.mouse.get_pos()
                     if 50 <= mouse_pos[0] <= 150 and 50 <= mouse_pos[1] <= 100:  # Проверка нажатия на кнопку "Back"
@@ -173,8 +191,11 @@ if __name__ == '__main__':
             screen.blit(background, (0, 0))
             draw_button(screen)
         elif current_screen == "second":
-            score += 1  # Увеличиваем счетчик (для примера)
-            draw_second_screen(screen, all_sprites, score)
+            if score < 1000:
+                score += 1
+                draw_second_screen(screen, all_sprites, score)
+            else:
+                game_over_screen(screen, score)
 
         pygame.display.flip()
         clock.tick(FPS)  # Ограничение FPS
