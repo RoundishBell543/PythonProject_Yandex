@@ -13,7 +13,7 @@ class Entity(pygame.sprite.Sprite):
         self.speed = 5
         self.is_out = False
         self.is_dead = False
-        self.jump_speed = -10
+        self.jump_speed = -15
         self.gravity = 0.5
         self.is_grounded = False
 
@@ -28,8 +28,8 @@ class Entity(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.speed_x
-        self.speed_y += self.gravity
         self.rect.y += self.speed_y
+        self.speed_y += self.gravity
         if self.is_dead:
             if self.rect.top > 470:
                 self.is_out = True
