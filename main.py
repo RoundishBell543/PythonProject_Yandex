@@ -46,7 +46,6 @@ class Entity(pygame.sprite.Sprite):
             if self.rect.right > 800:
                 self.rect.right = 800
 
-
 class Mario(Entity):
     def __init__(self, image):
         super().__init__(image)
