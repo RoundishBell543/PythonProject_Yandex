@@ -40,6 +40,11 @@ class Entity(pygame.sprite.Sprite):
                 self.is_grounded = True
                 self.speed_y = 0
                 self.rect.bottom = 470
+                # Проверка на выход за левую и правую границы экрана
+            if self.rect.left < 0:
+                self.rect.left = 0
+            if self.rect.right > 800:
+                self.rect.right = 800
 
 
 class Mario(Entity):
@@ -48,23 +53,23 @@ class Mario(Entity):
 
     def handle_input(self):
         self.speed_x = 0
-
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d]:
-            self.speed_x = self.speed  # Движение вправо
+            self.speed_x += self.speed  # Движение вправо
         elif keys[pygame.K_a]:
             self.speed_x = -self.speed  # Движение влево
-        if self.is_grounded and keys[pygame.K_w]:
-            self.is_grounded = False
-            self.jump()
 
+        if self.is_grounded and keys[pygame.K_SPACE]:
+            self.jump()
+    def jump(self):
+        self.is_grounded = False
+        self.speed_y = self.jump_speed
     def respawn(self):
         self.is_out = False
         self.is_dead = False
         self.rect.midbottom = (400, 530)
 
-    def jump(self):
-        self.speed_y = self.jump_speed
+
 
 
 def load_image(name, colorkey=None):
