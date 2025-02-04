@@ -61,15 +61,15 @@ class Mario(Entity):
 
         if self.is_grounded and keys[pygame.K_SPACE]:
             self.jump()
+
     def jump(self):
         self.is_grounded = False
         self.speed_y = self.jump_speed
+
     def respawn(self):
         self.is_out = False
         self.is_dead = False
         self.rect.midbottom = (400, 530)
-
-
 
 
 def load_image(name, colorkey=None):
@@ -99,12 +99,31 @@ def draw_button(screen):
     screen.blit(text, text_rect)
 
 
-def draw_second_screen(screen, all_sprites):  # Экран самой игры
+def draw_button_back(screen):
+    color_button = pygame.Color(255, 255, 255)
+    color_text = pygame.Color(0, 0, 0)
+    pygame.draw.rect(screen, color_button, (50, 50, 100, 50), 0)  # Кнопка "Back" в верхнем левом углу
+    font = pygame.font.Font(None, 36)
+    text = font.render("Back", True, color_text)
+    text_rect = text.get_rect(center=(100, 75))  # Центрируем текст на кнопке
+    screen.blit(text, text_rect)
+
+
+def draw_second_screen(screen, all_sprites, score):  # Экран самой игры
     # Отрисовка фона
     pygame.display.set_caption("GAME: MARIO RUN")
     back = load_image("ground.jpg")
     background_game = pygame.transform.scale(back, size)
     screen.blit(background_game, (0, 0))
+
+    # Отрисовка кнопки "Back"
+    draw_button_back(screen)
+
+    # Отрисовка счетчика
+    font = pygame.font.Font(None, 48)
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))  # Белый текст
+    score_rect = score_text.get_rect(center=(width // 2, 30))  # По центру вверху
+    screen.blit(score_text, score_rect)
 
     # Отрисовка спрайтов
     all_sprites.update()
@@ -135,6 +154,8 @@ if __name__ == '__main__':
 
     current_screen = "main"
     running = True
+    score = 0  # Счетчик
+
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -144,12 +165,17 @@ if __name__ == '__main__':
                     mouse_pos = pygame.mouse.get_pos()
                     if 650 <= mouse_pos[0] <= 750 and 250 <= mouse_pos[1] <= 325:
                         current_screen = "second"
+                elif current_screen == "second":
+                    mouse_pos = pygame.mouse.get_pos()
+                    if 50 <= mouse_pos[0] <= 150 and 50 <= mouse_pos[1] <= 100:  # Проверка нажатия на кнопку "Back"
+                        current_screen = "main"
 
         if current_screen == "main":
             screen.blit(background, (0, 0))
             draw_button(screen)
         elif current_screen == "second":
-            draw_second_screen(screen, all_sprites)
+            score += 1  # Увеличиваем счетчик (для примера)
+            draw_second_screen(screen, all_sprites, score)
 
         pygame.display.flip()
         clock.tick(FPS)  # Ограничение FPS
