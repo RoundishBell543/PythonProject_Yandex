@@ -75,7 +75,7 @@ class Mario(Entity):
 class Enemy(Entity):
     def __init__(self, enemy_image):
         super().__init__(enemy_image)
-        self.is_dead = False  # Добавляем флаг для отслеживания состояния врага
+        self.is_dead = False
 
     def spawn(self):
         direction = random.randint(0, 1)
@@ -88,17 +88,18 @@ class Enemy(Entity):
 
     def die(self):
         self.is_dead = True
-        self.speed_x = 0  # Останавливаем горизонтальное движение
-        self.speed_y = 0  # Начинаем падать вниз
-        self.gravity = 0.5  # Применяем гравитацию
+        self.speed_x = 0  # Остановить горизонтальное движение
+        self.speed_y = 10  # Ускоренно падать вниз
+        self.gravity = 0.5  # Применить гравитацию
 
     def update(self):
-        super().update()
         if self.is_dead:
+            self.speed_y += self.gravity  # Ускорять падение вниз
+            self.rect.y += self.speed_y
             if self.rect.top > 600:  # Если враг упал за пределы экрана
                 self.is_out = True
-
-
+        else:
+            self.rect.x += self.speed_x
 def load_image(name, colorkey=None):
     fullname = os.path.join('C:\\Users\\lexfe\\PycharmProjects\\pythonProject_Yandex\\images', name)
     # если файл не существует, то выходим
@@ -250,13 +251,14 @@ if __name__ == '__main__':
                         enemy.update()
 
                 # Проверка столкновений
-                for enemy in enemy_list:
+                for enemy in list(enemy_list):
                     if pygame.sprite.collide_rect(mario, enemy):
-                        if mario.rect.bottom <= enemy.rect.top + 10:  # Марио прыгает на врага
-                            enemy.die()
-                            killed_enemies += 1  # Увеличиваем счетчик убитых врагов
+                        if mario.rect.bottom <= enemy.rect.top + 10:  # Mario прыгает сверху
+                            mario.speed_y = mario.jump_speed  # Mario подпрыгивает от врага
+                            enemy.die()  # Враг начинает падать вниз
+                            killed_enemies += 1
                         else:
-                            mario.kill(mario_image)  # Марио умирает, если сталкивается с врагом сбоку
+                            mario.kill(mario_image)  # Mario умирает при столкновении сбоку
                             break
 
 
