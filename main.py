@@ -17,6 +17,7 @@ class Entity(pygame.sprite.Sprite):
         self.gravity = 0.5
         self.is_grounded = False
 
+
     def handle_input(self):
         pass
 
@@ -50,6 +51,35 @@ class Mario(Entity):
 
     def __init__(self, image):
         super().__init__(image)
+        self.frames = [pygame.image.load(f"C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\caracter_run{i}.png") for i in range(0, 2)]
+        self.current_frame = 0
+        self.image = self.frames[self.current_frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = (100, height - 100)
+        self.speed_y = 0
+        self.is_grounded = False
+        self.anim_counter = 0
+
+    def update(self):
+        # Гравитация
+        self.speed_y += self.gravity
+        self.rect.y += self.speed_y
+
+        # Ограничение падения
+        if self.rect.bottom >= height - 50:
+            self.rect.bottom = height - 50
+            self.speed_y = 0
+            self.is_grounded = True
+        else:
+            self.is_grounded = False
+
+        # Анимация бега
+        if self.is_grounded:
+            self.anim_counter += 1
+            if self.anim_counter % 10 == 0:  # Меняем кадр каждые 10 тиков
+                self.current_frame = (self.current_frame + 1) % len(self.frames)
+                self.image = self.frames[self.current_frame]
+
 
     def handle_input(self):
         self.speed_x = 0
@@ -62,9 +92,11 @@ class Mario(Entity):
         if self.is_grounded and keys[pygame.K_SPACE]:
             self.jump()
 
+
     def jump(self):
-        self.is_grounded = False
-        self.speed_y = self.jump_speed
+        if self.is_grounded:
+            self.speed_y = self.jump_speed
+            # pygame.mixer.Sound("sounds/jump.wav").play()
 
     def respawn(self):
         self.is_out = False
@@ -101,7 +133,7 @@ class Enemy(Entity):
         else:
             self.rect.x += self.speed_x
 def load_image(name, colorkey=None):
-    fullname = os.path.join('C:\\Users\\lexfe\\PycharmProjects\\pythonProject_Yandex\\images', name)
+    fullname = os.path.join('C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
