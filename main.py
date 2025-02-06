@@ -160,13 +160,8 @@ def draw_second_screen(screen, all_sprites, score, killed_enemies):  # Экра�
     # Отрисовка кнопки "Back"
     draw_button_back(screen)
 
-    # Отрисовка счетчика
-    font = pygame.font.Font(None, 48)
-    score_text = font.render(f"Score: {score}", True, (255, 255, 255))  # Белый текст
-    score_rect = score_text.get_rect(center=(width // 2, 30))  # По центру вверху
-    screen.blit(score_text, score_rect)
-
     # Отрисовка счетчика убитых врагов
+    font = pygame.font.Font(None, 48)
     killed_text = font.render(f"Killed: {killed_enemies}", True, (255, 255, 255))  # Белый текст
     killed_rect = killed_text.get_rect(center=(width // 2, 70))  # По центру вверху, ниже основного счетчика
     screen.blit(killed_text, killed_rect)
@@ -232,7 +227,7 @@ if __name__ == '__main__':
             screen.blit(background, (0, 0))
             draw_button(screen)
         elif current_screen == "second":
-            if score < 100:  # Увеличиваем лимит счета для тестирования
+            if mario.rect.y < 470:
                 draw_second_screen(screen, all_sprites, score, killed_enemies)
                 now = pygame.time.get_ticks()
                 elapsed = now - last_spawn_time
@@ -263,7 +258,7 @@ if __name__ == '__main__':
 
 
             else:
-                game_over_screen(screen, score)
+                game_over_screen(screen, killed_enemies)
                 current_screen = "main"
 
         pygame.display.flip()
