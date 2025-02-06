@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import random
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, image):
@@ -30,7 +31,7 @@ class Entity(pygame.sprite.Sprite):
         self.rect.y += self.speed_y
         self.speed_y += self.gravity
         if self.is_dead:
-            if self.rect.top > 470:
+            if self.rect.top > 600:  # Если враг упал за пределы экрана
                 self.is_out = True
         else:
             self.handle_input()
@@ -71,6 +72,33 @@ class Mario(Entity):
         self.rect.midbottom = (400, 530)
 
 
+class Enemy(Entity):
+    def __init__(self, enemy_image):
+        super().__init__(enemy_image)
+        self.is_dead = False  # Добавляем флаг для отслеживания состояния врага
+
+    def spawn(self):
+        direction = random.randint(0, 1)
+        if direction == 0:
+            self.speed_x = self.speed
+            self.rect.bottomright = (0, 470)
+        else:
+            self.speed_x = -self.speed
+            self.rect.bottomleft = (800, 470)
+
+    def die(self):
+        self.is_dead = True
+        self.speed_x = 0  # Останавливаем горизонтальное движение
+        self.speed_y = 0  # Начинаем падать вниз
+        self.gravity = 0.5  # Применяем гравитацию
+
+    def update(self):
+        super().update()
+        if self.is_dead:
+            if self.rect.top > 600:  # Если враг упал за пределы экрана
+                self.is_out = True
+
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('C:\\Users\\lexfe\\PycharmProjects\\pythonProject_Yandex\\images', name)
     # если файл не существует, то выходим
@@ -100,6 +128,7 @@ def game_over_screen(screen, score):
     pygame.display.flip()
 
     pygame.time.delay(3000)
+
 def draw_button(screen):
     color_button = pygame.Color(255, 255, 255)
     color_text = pygame.Color(0, 0, 0)
@@ -120,7 +149,7 @@ def draw_button_back(screen):
     screen.blit(text, text_rect)
 
 
-def draw_second_screen(screen, all_sprites, score):  # Экран самой игры
+def draw_second_screen(screen, all_sprites, score, killed_enemies):  # Экран самой игры
     # Отрисовка фона
     pygame.display.set_caption("GAME: MARIO RUN")
     back = load_image("ground.jpg")
@@ -136,6 +165,10 @@ def draw_second_screen(screen, all_sprites, score):  # Экран самой и�
     score_rect = score_text.get_rect(center=(width // 2, 30))  # По центру вверху
     screen.blit(score_text, score_rect)
 
+    # Отрисовка счетчика убитых врагов
+    killed_text = font.render(f"Killed: {killed_enemies}", True, (255, 255, 255))  # Белый текст
+    killed_rect = killed_text.get_rect(center=(width // 2, 70))  # По центру вверху, ниже основного счетчика
+    screen.blit(killed_text, killed_rect)
 
     # Отрисовка спрайтов
     all_sprites.update()
@@ -164,12 +197,17 @@ if __name__ == '__main__':
     mario.rect.y = 470 - mario.rect.height  # Помещаем Марио на землю
     all_sprites.add(mario)
 
-    #создание спрайта врага
-
+    # создание спрайта врага
+    enemy_image = load_image("enemy.jpg", -1)
+    enemy_list = []
+    delay_for_start = 2500
+    spawn_enemy = 2000
+    last_spawn_time = pygame.time.get_ticks()
 
     current_screen = "main"
     running = True
     score = 0  # Счетчик
+    killed_enemies = 0  # Счетчик убитых врагов
 
     while running:
         for event in pygame.event.get():
@@ -183,6 +221,7 @@ if __name__ == '__main__':
                         mario.rect.x = 5
                         mario.rect.y = 470 - mario.rect.height
                         score = 0
+                        killed_enemies = 0  # Сбрасываем счетчик убитых врагов
                 elif current_screen == "second":
                     mouse_pos = pygame.mouse.get_pos()
                     if 50 <= mouse_pos[0] <= 150 and 50 <= mouse_pos[1] <= 100:  # Проверка нажатия на кнопку "Back"
@@ -192,11 +231,38 @@ if __name__ == '__main__':
             screen.blit(background, (0, 0))
             draw_button(screen)
         elif current_screen == "second":
-            if score < 1000:
-                score += 1
-                draw_second_screen(screen, all_sprites, score)
+            if score < 100:  # Увеличиваем лимит счета для тестирования
+                draw_second_screen(screen, all_sprites, score, killed_enemies)
+                now = pygame.time.get_ticks()
+                elapsed = now - last_spawn_time
+                if elapsed > spawn_enemy:
+                    last_spawn_time = now
+                    new_enemy = Enemy(enemy_image)
+                    new_enemy.spawn()
+                    enemy_list.append(new_enemy)
+                    all_sprites.add(new_enemy)
+
+                for enemy in list(enemy_list):
+                    if enemy.is_out:
+                        enemy_list.remove(enemy)
+                        all_sprites.remove(enemy)
+                    else:
+                        enemy.update()
+
+                # Проверка столкновений
+                for enemy in enemy_list:
+                    if pygame.sprite.collide_rect(mario, enemy):
+                        if mario.rect.bottom <= enemy.rect.top + 10:  # Марио прыгает на врага
+                            enemy.die()
+                            killed_enemies += 1  # Увеличиваем счетчик убитых врагов
+                        else:
+                            mario.kill(mario_image)  # Марио умирает, если сталкивается с врагом сбоку
+                            break
+
+
             else:
                 game_over_screen(screen, score)
+                current_screen = "main"
 
         pygame.display.flip()
         clock.tick(FPS)  # Ограничение FPS
