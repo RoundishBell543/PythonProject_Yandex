@@ -96,7 +96,7 @@ class Mario(Entity):
     def jump(self):
         if self.is_grounded:
             self.speed_y = self.jump_speed
-            # pygame.mixer.Sound("sounds/jump.wav").play()
+
 
     def respawn(self):
         self.is_out = False
