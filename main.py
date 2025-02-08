@@ -132,6 +132,19 @@ class Enemy(Entity):
                 self.is_out = True
         else:
             self.rect.x += self.speed_x
+
+
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super().__init__()
+        self.image = pygame.image.load("картинка.png")
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+
+    def update(self):
+        pass  # Монетки не двигаются
+
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images', name)
     # если файл не существует, то выходим
@@ -214,6 +227,7 @@ if __name__ == '__main__':
     background = pygame.transform.scale(icon, size)
     FPS = 60
     clock = pygame.time.Clock()
+    coins = pygame.sprite.Group(Coin(400, height - 150))
 
     # Группа спрайтов для персонажа
     all_sprites = pygame.sprite.Group()
@@ -287,6 +301,12 @@ if __name__ == '__main__':
                         else:
                             mario.kill(mario_image)  # Mario умирает при столкновении сбоку
                             break
+
+                    # Проверка столкновений с монетками
+                coin_hit_list = pygame.sprite.spritecollide(mario, coins, True)
+                if coin_hit_list:
+                    score += 10
+
 
 
             else:
