@@ -1,7 +1,9 @@
-import pygame
-import sys
 import os
 import random
+import sys
+
+import pygame
+
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, image):
@@ -16,7 +18,6 @@ class Entity(pygame.sprite.Sprite):
         self.jump_speed = -15
         self.gravity = 0.5
         self.is_grounded = False
-
 
     def handle_input(self):
         pass
@@ -40,18 +41,20 @@ class Entity(pygame.sprite.Sprite):
             if self.rect.bottom > 470:
                 self.is_grounded = True
                 self.speed_y = 0
-                self.rect.bottom = 470
-                # Проверка на выход за левую и правую границы экрана
+                self.rect.bottom = 470  # Проверка на выход за левую и правую границы экрана
             if self.rect.left < 0:
                 self.rect.left = 0
             if self.rect.right > 800:
                 self.rect.right = 800
 
+
 class Mario(Entity):
 
     def __init__(self, image):
         super().__init__(image)
-        self.frames = [pygame.image.load(f"C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\caracter_run{i}.png") for i in range(0, 2)]
+        self.frames = [pygame.image.load(
+            f"C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\caracter_run{i}.png")
+                       for i in range(0, 2)]
         self.current_frame = 0
         self.image = self.frames[self.current_frame]
         self.rect = self.image.get_rect()
@@ -80,7 +83,6 @@ class Mario(Entity):
                 self.current_frame = (self.current_frame + 1) % len(self.frames)
                 self.image = self.frames[self.current_frame]
 
-
     def handle_input(self):
         self.speed_x = 0
         keys = pygame.key.get_pressed()
@@ -92,11 +94,9 @@ class Mario(Entity):
         if self.is_grounded and keys[pygame.K_SPACE]:
             self.jump()
 
-
     def jump(self):
         if self.is_grounded == False:
             self.speed_y = self.jump_speed
-
 
     def respawn(self):
         self.is_out = False
@@ -137,15 +137,18 @@ class Enemy(Entity):
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\coin.png")
+        self.image = pygame.image.load(
+            "C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\coin.png")
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
     def update(self):
         pass  # Монетки не двигаются
 
+
 def load_image(name, colorkey=None):
-    fullname = os.path.join('C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images', name)
+    fullname = os.path.join('C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images',
+                            name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -160,9 +163,11 @@ def load_image(name, colorkey=None):
         image = image.convert_alpha()
     return image
 
+
 def save_score(score):
     with open("scores.txt", "a") as f:
         f.write(str(score) + "\n")
+
 
 def game_over_screen(screen, score):
     save_score(score)
@@ -173,6 +178,7 @@ def game_over_screen(screen, score):
     pygame.display.flip()
 
     pygame.time.delay(3000)
+
 
 def draw_button(screen):
     color_button = pygame.Color(255, 255, 255)
