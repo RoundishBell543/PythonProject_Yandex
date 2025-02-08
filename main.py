@@ -90,8 +90,8 @@ class Mario(Entity):
             self.jump()
 
     def jump(self):
-        if self.is_grounded == False:
-            self.speed_y = self.jump_speed
+        self.is_grounded = False
+        self.speed_y = self.jump_speed
 
     def respawn(self):
         self.is_out = False
