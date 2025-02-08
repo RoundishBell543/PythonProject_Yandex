@@ -144,7 +144,6 @@ class Coin(pygame.sprite.Sprite):
     def update(self):
         pass  # Монетки не двигаются
 
-
 def load_image(name, colorkey=None):
     fullname = os.path.join('C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images', name)
     # если файл не существует, то выходим
