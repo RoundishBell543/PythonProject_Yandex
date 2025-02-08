@@ -94,7 +94,7 @@ class Mario(Entity):
 
 
     def jump(self):
-        if self.is_grounded:
+        if self.is_grounded == False:
             self.speed_y = self.jump_speed
 
 
@@ -137,7 +137,7 @@ class Enemy(Entity):
 class Coin(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.image = pygame.image.load("coin.png")
+        self.image = pygame.image.load("C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\coin.png")
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
