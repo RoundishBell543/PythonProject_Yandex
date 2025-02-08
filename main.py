@@ -52,45 +52,40 @@ class Mario(Entity):
 
     def __init__(self, image):
         super().__init__(image)
-        self.frames = [pygame.image.load(
-            f"C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\caracter_run{i}.png")
-                       for i in range(0, 2)]
-        self.current_frame = 0
-        self.image = self.frames[self.current_frame]
-        self.rect = self.image.get_rect()
-        self.rect.center = (100, height - 100)
-        self.speed_y = 0
-        self.is_grounded = False
-        self.anim_counter = 0
+        self.imageR = pygame.transform.flip(image, False, False)
+        self.imageL = pygame.transform.flip(image, True,
+                                            False)
+        # self.frames = [pygame.image.load(  #     f"C:\\Users\\heiar\\OneDrive\\Документы\\SHP\\KOD\\projects\\PythonProject_Yandex\\images\\caracter_run{i}.png")  #                for i in range(0, 2)]  # self.current_frame = 0  # self.image = self.frames[self.current_frame]  # self.rect = self.image.get_rect()  # self.rect.center = (100, height - 100)  # self.speed_y = 0  # self.is_grounded = False  # self.anim_counter = 0
 
-    def update(self):
-        # Гравитация
-        self.speed_y += self.gravity
-        self.rect.y += self.speed_y
-
-        # Ограничение падения
-        if self.rect.bottom >= height - 50:
-            self.rect.bottom = height - 50
-            self.speed_y = 0
-            self.is_grounded = True
-        else:
-            self.is_grounded = False
-
-        # Анимация бега
-        if self.is_grounded:
-            self.anim_counter += 1
-            if self.anim_counter % 10 == 0:  # Меняем кадр каждые 10 тиков
-                self.current_frame = (self.current_frame + 1) % len(self.frames)
-                self.image = self.frames[self.current_frame]
+    # def update(self):
+    #     # Гравитация
+    #     self.speed_y += self.gravity
+    #     self.rect.y += self.speed_y
+    #
+    #     # Ограничение падения
+    #     if self.rect.bottom >= height - 50:
+    #         self.rect.bottom = height - 50
+    #         self.speed_y = 0
+    #         self.is_grounded = True
+    #     else:
+    #         self.is_grounded = False
+    #
+    #     # Анимация бега
+    #     if self.is_grounded:
+    #         self.anim_counter += 1
+    #         if self.anim_counter % 10 == 0:  # Меняем кадр каждые 10 тиков
+    #             self.current_frame = (self.current_frame + 1) % len(self.frames)
+    #             self.image = self.frames[self.current_frame]
 
     def handle_input(self):
         self.speed_x = 0
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d]:
             self.speed_x += self.speed  # Движение вправо
+            self.image = self.imageR
         elif keys[pygame.K_a]:
             self.speed_x = -self.speed  # Движение влево
-
+            self.image = self.imageL
         if self.is_grounded and keys[pygame.K_SPACE]:
             self.jump()
 
